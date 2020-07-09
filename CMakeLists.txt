@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(RainEngine_CMake)
+project(Freya)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -14,7 +14,7 @@ find_package(OpenGL REQUIRED)
 
 include_directories( "include" )
 
-add_executable(${PROJECT_NAME} "src/main.cpp")
+add_executable("${PROJECT_NAME}" "src/main.cpp")
 target_compile_definitions(${PROJECT_NAME} PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 target_link_libraries(
         ${PROJECT_NAME}
