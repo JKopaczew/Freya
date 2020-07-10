@@ -5,6 +5,8 @@
 
 int main(void)
 {
+
+    // TODO find a way to do this outside code maybe?
     int W = 640;
     int H = 480;
     const char *Title= "Freya";
