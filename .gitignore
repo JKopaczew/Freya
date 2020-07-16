@@ -1,5 +1,4 @@
-src/.vs/
+src/.vs
 src/x64
 src/*.user
-
-*.user
+notes.txt

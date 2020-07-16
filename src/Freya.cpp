@@ -1,38 +1,40 @@
 #include <assert.h>
 #include <stdio.h>
 #include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
 
 int main(void)
 {
-    GLFWwindow* window;
+	GLFWwindow* window;
 
-    /* Initialize the library */
-    int rc = glfwInit();
-    assert(rc);
+	// Initialize glfw
+	int rc = glfwInit();
+	assert(rc);
 
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1024, 768, "Freya", NULL, NULL);
-    assert(window);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
+	vkCreateInstance();
 
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
+	// Create a windowed mode window and its OpenGL context
+	window = glfwCreateWindow(1024, 768, "Freya", NULL, NULL);
+	assert(window);
+	if (!window)
+	{
+		glfwTerminate();
+		return -1;
+	}
 
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
+	// Make the window's context current
+	glfwMakeContextCurrent(window);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+	// Loop until the user closes the window
+	while (!glfwWindowShouldClose(window))
+	{
+		// Swap front and back buffers
+		glfwSwapBuffers(window);
 
-        /* Poll for and process events */
-        glfwPollEvents();
-    }
+		// Poll for and process events
+		glfwPollEvents();
+	}
 
-    glfwTerminate();
-    return 0;
+	glfwTerminate();
+	return 0;
 }
