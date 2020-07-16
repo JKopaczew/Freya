@@ -1,4 +1,5 @@
 .vs
-.idea
-/cmake-build-debug
-/out 
+src/.vs/
+src/x64
+src/*.user 
+
