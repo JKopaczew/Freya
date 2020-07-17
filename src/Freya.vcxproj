@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_GLFW_WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;_GLFW_WIN32;_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../extern/glfw/include;$(VULKAN_SDK)\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../extern/glm;../extern/glfw/include;$(VULKAN_SDK)\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,7 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_GLFW_WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;_GLFW_WIN32;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../extern/glfw/include;$(VULKAN_SDK)\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../extern/glm;../extern/glfw/include;$(VULKAN_SDK)\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_GLFW_WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;_GLFW_WIN32;_CRT_SECURE_NO_WARNINGS;$(PreprocessorDefinitions)_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_GLFW_WIN32</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../extern/glfw/include;$(VULKAN_SDK)\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../extern/glm;../extern/glfw/include;$(VULKAN_SDK)\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_GLFW_WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;_GLFW_WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_GLFW_WIN32</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../extern/glfw/include;$(VULKAN_SDK)\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../extern/glm;../extern/glfw/include;$(VULKAN_SDK)\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
