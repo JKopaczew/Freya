@@ -1,6 +1,4 @@
-//#include <vulkan/vulkan.h>
-
-#define GLFW_INCLUDE_VULKAN
+#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
@@ -10,11 +8,22 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <assert.h>
 #include <vector>
+#include <cstring>
 
 const uint32_t Width = 1024;
 const uint32_t Height = 768;
+
+const std::vector<const char*> validationLayers =
+{
+	"VK_LAYER_KHRONOS_validation"
+};
+
+#ifdef NDEGUB
+	const bool enableValidationLayers = false;
+#else
+	const bool enableValidationLayers = true;
+#endif
 
 class HelloTriangle
 {
@@ -30,17 +39,44 @@ public:
 private:
 	GLFWwindow* window;
 	VkInstance instance;
+	
+	bool checkValidationLayerSupport() 
+	{
+		uint32_t layerCount;
+		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+		std::vector<VkLayerProperties> availableLayers(layerCount);
+		vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+		for (const char* layerName : validationLayers) 
+		{
+			bool layerFound = false;
+
+			for (const auto& layerProperties : availableLayers) 
+			{
+				if (strcmp(layerName, layerProperties.layerName) == 0) {
+					layerFound = true;
+					break;
+				}
+			}
+			if (!layerFound)
+			{
+				return false;
+			}
+		
+		}
+		return true;
+	}
+	
 	void initWindow()
 	{
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-		//GLFW CODE
 		// Create a windowed mode window and its OpenGL context
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		window = glfwCreateWindow(Width, Height, "Freya", NULL, NULL);
-		assert(window);
 	}
 
 	void initVulkan()
@@ -66,7 +102,13 @@ private:
 		glfwTerminate();
 	}
 
-	void createInstance() {
+	void createInstance() 
+	{
+		if (enableValidationLayers && !checkValidationLayerSupport()) 
+		{
+			throw std::runtime_error("validation layer requested, but not avaiable!");
+			//std::cout << "validation layer requested, but not avaiable!";
+		}
 		uint32_t extensionCount = 0; //set default value of extension count that will be passed to vkEnumerateInstanceExtensionProperties
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions;
@@ -89,12 +131,23 @@ private:
 		createInfo.ppEnabledExtensionNames = glfwExtensions;
 		createInfo.enabledLayerCount = 0;
 
+		if (enableValidationLayers) 
+		{
+			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+			createInfo.ppEnabledLayerNames = validationLayers.data();
+		}
+		else 
+		{
+			createInfo.enabledLayerCount = 0;
+		}
+
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 
 		if (vkCreateInstance(&createInfo, nullptr, &instance)!= VK_SUCCESS) 
 		{
 			throw std::runtime_error("failed to create vulkan instance");
 		}
+
 
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 		std::vector<VkExtensionProperties> extensions(extensionCount);

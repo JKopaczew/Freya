@@ -83,8 +83,5 @@
     <ClInclude Include="..\extern\glfw\src\osmesa_context.h">
       <Filter>glfw</Filter>
     </ClInclude>
-    <ClInclude Include="include\HelloTriangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
