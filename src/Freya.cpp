@@ -39,6 +39,7 @@ public:
 private:
 	GLFWwindow* window;
 	VkInstance instance;
+	VkDevice device;
 	
 	bool checkValidationLayerSupport() 
 	{
@@ -82,6 +83,8 @@ private:
 	void initVulkan()
 	{
 		createInstance();
+		pickPhysicalDevice();
+		createLogicalDevice();
 	}
 
 	void mainLoop()
@@ -162,14 +165,53 @@ private:
 		}
 		
 	}
+
+	void pickPhysicalDevice() 
+	{
+		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+
+		if (deviceCount == 0) 
+		{
+			throw std::runtime_error("failed to find GPU with Vulkan Support!");
+		}
+
+		std::vector<VkPhysicalDevice> devices(deviceCount);
+		vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+		
+		for (const auto& device : devices)
+		{
+			if (isDeviceSuitable(device))
+			{
+				physicalDevice = device;
+				break;
+			}
+		}
+
+		if (physicalDevice == VK_NULL_HANDLE) 
+		{
+			throw std::runtime_error("failed to find a suitable GPU!");
+		}
+	}
+
+	bool isDeviceSuitable(VkPhysicalDevice device)
+	{
+		return true;
+	}
+
+	void createLogicalDevice()
+	{
+		
+	}
 };
 
 int main()
 {
 	
-	HelloTriangle triangle;
+	HelloTriangle a;
 
-	triangle.run();
+	a.run();
 
 	return 0;
 }
