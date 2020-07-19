@@ -1,10 +1,12 @@
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
+/*
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+*/
 
 #include <iostream>
 #include <stdexcept>
@@ -41,6 +43,8 @@ private:
 	GLFWwindow* window;
 	VkInstance instance;
 	VkDevice device;
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+	VkQueue graphicsQueue;
 
 	bool checkValidationLayerSupport()
 	{
@@ -99,8 +103,8 @@ private:
 
 	void cleanup()
 	{
+		vkDestroyDevice(device, nullptr);
 		vkDestroyInstance(instance, nullptr);
-
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
@@ -110,7 +114,6 @@ private:
 		if (enableValidationLayers && !checkValidationLayerSupport())
 		{
 			throw std::runtime_error("validation layer requested, but not avaiable!");
-			//std::cout << "validation layer requested, but not avaiable!";
 		}
 		uint32_t extensionCount = 0; //set default value of extension count that will be passed to vkEnumerateInstanceExtensionProperties
 		uint32_t glfwExtensionCount = 0;
@@ -164,7 +167,6 @@ private:
 
 	void pickPhysicalDevice()
 	{
-		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 		uint32_t deviceCount = 0;
 		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 
@@ -189,19 +191,24 @@ private:
 		{
 			throw std::runtime_error("failed to find a suitable GPU!");
 		}
+
+		//TODO: Fix get physical device properties
 	}
 
 	bool isDeviceSuitable(VkPhysicalDevice device)
 	{
+		VkPhysicalDeviceProperties deviceProperties;
+		vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+		VkPhysicalDeviceFeatures deviceFeatures;
+		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
 		QueueFamilyIndices indices = findQueueFamilies(device);
 
-		return indices.isComplete();
+		//This may break without a dedicated GPU
+		return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader && indices.isComplete();
 	}
-	/*
-	uint32_t findQueueFamilies(VkPhysicalDevice device)
-	{
-	}
-	*/
+
 	struct QueueFamilyIndices
 	{
 		std::optional<uint32_t> graphicsFamily;
@@ -243,7 +250,40 @@ private:
 
 	void createLogicalDevice()
 	{
+		QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+		float queuePriority = 1.0f;
 
+		VkDeviceQueueCreateInfo queueCreateInfo{};
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+
+		VkPhysicalDeviceFeatures deviceFeatures{};
+
+		VkDeviceCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.pQueueCreateInfos = &queueCreateInfo;
+		createInfo.queueCreateInfoCount = 1;
+		createInfo.pEnabledFeatures = &deviceFeatures;
+		createInfo.enabledExtensionCount = 0;
+
+		if (enableValidationLayers)
+		{
+			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+			createInfo.ppEnabledLayerNames = validationLayers.data();
+		}
+		else
+		{
+			createInfo.enabledLayerCount = 0;
+		}
+
+		if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create logical device!");
+		}
+
+		vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	}
 };
 
