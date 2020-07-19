@@ -9,6 +9,7 @@
 */
 
 #include <iostream>
+#include <stdio.h>
 #include <stdexcept>
 #include <vector>
 #include <cstring>
@@ -75,28 +76,29 @@ private:
 
 	void initWindow()
 	{
+		
+
 		glfwInit();
+
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-		// Create a windowed mode window and its OpenGL context
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		window = glfwCreateWindow(Width, Height, "Freya", NULL, NULL);
+		window = glfwCreateWindow(Width, Height, "Freya", nullptr, nullptr);
 	}
 
 	void initVulkan()
 	{
 		createInstance();
+		createSurface();
 		pickPhysicalDevice();
 		createLogicalDevice();
 	}
 
 	void mainLoop()
 	{
-		// Loop until the user closes the window
 		while (!glfwWindowShouldClose(window))
-		{
-			// Poll for and process events
+		{			
+			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 	}
@@ -104,10 +106,12 @@ private:
 	void cleanup()
 	{
 		vkDestroyDevice(device, nullptr);
+		vkDestroySurfaceKHR(instance, surface, nullptr);
 		vkDestroyInstance(instance, nullptr);
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
+
 
 	void createInstance()
 	{
@@ -162,6 +166,16 @@ private:
 		for (const auto& extension : extensions)
 		{
 			std::cout << '\t' << extension.extensionName << '\n';
+		}
+	}
+
+	VkSurfaceKHR surface;
+
+	void createSurface()
+	{
+		if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create windows surface!");
 		}
 	}
 
@@ -287,10 +301,16 @@ private:
 	}
 };
 
+static void error_callback(int error, const char* description)
+{
+	fprintf(stderr, "Error: %s\n", description);
+}
+
+
 int main()
 {
+	glfwSetErrorCallback(error_callback);
 	HelloTriangle a;
-
 	a.run();
 
 	return 0;
