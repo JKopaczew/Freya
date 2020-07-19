@@ -9,11 +9,11 @@
 */
 
 #include <iostream>
-#include <stdio.h>
 #include <stdexcept>
 #include <vector>
 #include <cstring>
 #include <optional>
+#include <set>
 
 const uint32_t Width = 1024;
 const uint32_t Height = 768;
@@ -29,6 +29,17 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+struct QueueFamilyIndices
+{
+	std::optional<uint32_t> graphicsFamily;
+	std::optional<uint32_t> presentFamily;
+
+	bool isComplete()
+	{
+		return graphicsFamily.has_value() && presentFamily.has_value();
+	}
+};
+
 class HelloTriangle
 {
 public:
@@ -39,13 +50,15 @@ public:
 		mainLoop();
 		cleanup();
 	}
-
+	
 private:
 	GLFWwindow* window;
 	VkInstance instance;
+	VkSurfaceKHR surface;
 	VkDevice device;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkQueue graphicsQueue;
+	VkQueue presentQueue;
 
 	bool checkValidationLayerSupport()
 	{
@@ -76,8 +89,6 @@ private:
 
 	void initWindow()
 	{
-		
-
 		glfwInit();
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -97,7 +108,7 @@ private:
 	void mainLoop()
 	{
 		while (!glfwWindowShouldClose(window))
-		{			
+		{
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
@@ -111,7 +122,6 @@ private:
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
-
 
 	void createInstance()
 	{
@@ -169,8 +179,6 @@ private:
 		}
 	}
 
-	VkSurfaceKHR surface;
-
 	void createSurface()
 	{
 		if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
@@ -205,10 +213,9 @@ private:
 		{
 			throw std::runtime_error("failed to find a suitable GPU!");
 		}
-
-		//TODO: Fix get physical device properties
 	}
 
+	
 	bool isDeviceSuitable(VkPhysicalDevice device)
 	{
 		VkPhysicalDeviceProperties deviceProperties;
@@ -219,19 +226,9 @@ private:
 
 		QueueFamilyIndices indices = findQueueFamilies(device);
 
-		//This may break without a dedicated GPU
+		//TODO: This may break without a dedicated GPU
 		return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader && indices.isComplete();
 	}
-
-	struct QueueFamilyIndices
-	{
-		std::optional<uint32_t> graphicsFamily;
-
-		bool isComplete()
-		{
-			return graphicsFamily.has_value();
-		}
-	};
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
 	{
@@ -251,6 +248,14 @@ private:
 				indices.graphicsFamily = i;
 			}
 
+			VkBool32 presentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+
+			if (presentSupport)
+			{
+				indices.presentFamily = i;
+			}
+
 			if (indices.isComplete())
 			{
 				break;
@@ -267,18 +272,33 @@ private:
 		QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 		float queuePriority = 1.0f;
 
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+
+		for (uint32_t queueFamily : uniqueQueueFamilies)
+		{
+			VkDeviceQueueCreateInfo queueCreateInfo{};
+			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueCreateInfo.queueFamilyIndex = queueFamily;
+			queueCreateInfo.queueCount = 1;
+			queueCreateInfo.pQueuePriorities = &queuePriority;
+			queueCreateInfos.push_back(queueCreateInfo);
+		}
+
+		/* //OLD
 		VkDeviceQueueCreateInfo queueCreateInfo{};
 		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 		queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
 		queueCreateInfo.queueCount = 1;
 		queueCreateInfo.pQueuePriorities = &queuePriority;
+		*/
 
 		VkPhysicalDeviceFeatures deviceFeatures{};
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		createInfo.pQueueCreateInfos = &queueCreateInfo;
-		createInfo.queueCreateInfoCount = 1;
+		createInfo.pQueueCreateInfos = queueCreateInfos.data();
+		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		createInfo.pEnabledFeatures = &deviceFeatures;
 		createInfo.enabledExtensionCount = 0;
 
@@ -298,14 +318,14 @@ private:
 		}
 
 		vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
+		vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 	}
 };
 
 static void error_callback(int error, const char* description)
 {
-	fprintf(stderr, "Error: %s\n", description);
+	std::cout << description << "\n";
 }
-
 
 int main()
 {
