@@ -1,4 +1,4 @@
-# Freya
+# Vulkan Renderer
 
 This is just a hobby project to learn Vulkan and graphics rendering. I will mostly be following tutorials and online resources, who knows, maybe something interesting will come of this.
 
@@ -18,7 +18,7 @@ The renderer is written using Visual Studio 2019 cummunity and Vulkan SDK (SDK m
 
 In order to build and run the project, clone this repository using --recursive flag as git submodules are utilised
 
-	git clone https://github.com/jkopaczew/freya.git --recursive
+	git clone https://github.com/jkopaczew/vulkan-renderer.git --recursive
 
 I use Vulkan SDK version 1.2.141.2
 
