@@ -107,7 +107,7 @@ private:
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-		window = glfwCreateWindow(Width, Height, "Freya", nullptr, nullptr);
+		window = glfwCreateWindow(Width, Height, "Vulkan-Renderer", nullptr, nullptr);
 	}
 
 	void initVulkan()
@@ -385,6 +385,11 @@ private:
 		}
 
 		return details;
+	}
+
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& avaiableFormats)
+	{
+		
 	}
 };
 

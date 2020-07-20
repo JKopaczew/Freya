@@ -24,6 +24,7 @@
     <ProjectGuid>{0d033ca3-79ed-46f9-83bc-2ff23f8649e9}</ProjectGuid>
     <RootNamespace>Freya</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Vulkan-Renderer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -170,7 +171,7 @@
     <ClCompile Include="..\extern\glfw\src\win32_time.c" />
     <ClCompile Include="..\extern\glfw\src\win32_window.c" />
     <ClCompile Include="..\extern\glfw\src\window.c" />
-    <ClCompile Include="Freya.cpp" />
+    <ClCompile Include="Vulkan-Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\extern\glfw\src\egl_context.h" />
