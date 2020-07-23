@@ -1,12 +1,13 @@
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
-/*
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/vec4.hpp>
+#include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
-*/
+
 
 #include <iostream>
 #include <stdexcept>
@@ -535,15 +536,27 @@ private:
 	}
 };
 
-//TODO: Remove once vulkan buffer is created for glfw context
+// TODO (jarek): Remove once vulkan buffer is created for glfw context
 static void error_callback(int error, const char* description)
 {
 	std::cout << description << "\n";
 }
 
+#versions 450
+
+vec2 positions[3] = vec2[]
+{
+	vec2(0.0, -0.5),
+	vec2(0.5, 0.5),
+	vec2(-0.5, 0.5),
+};
+
 int main()
 {
-	//glfwSetErrorCallback(error_callback); //TODO: Remove once vulkan buffer is created for glfw context
+	//glfwSetErrorCallback(error_callback); // TODO(jarek): Remove once vulkan buffer is created for glfw context
+	
+	// TODO (jarek): defince vec 
+	gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0)
 	HelloTriangle a;
 	a.run();
 	return 0;
