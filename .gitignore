@@ -2,3 +2,6 @@ src/.vs
 src/x64
 src/*.user
 notes.txt
+/build
+/bin
+project.4coder
