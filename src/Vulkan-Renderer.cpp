@@ -11,7 +11,7 @@
 */
 #include <glm/glm.hpp>
 
-
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -463,17 +463,51 @@ class HelloTriangle
 			}
 		}
 	}
-    
+	static std::vector<char> readFile(const std::string& filename) {
+		std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+		if (!file.is_open()) {
+			throw std::runtime_error("failed to open file!");
+		}
+
+		size_t fileSize = (size_t)file.tellg();
+		std::vector<char> buffer(fileSize);
+
+		file.seekg(0);
+		file.read(buffer.data(), fileSize);
+
+		file.close();
+
+		return buffer;
+	}
+
 	void createGraphicsPipeline(){
-		
+		auto vertShaderCode = readFile("shaders/vert.spv");
+		auto fragShaderCode = readFile("shaders/frag.spv");
+
+		VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
+		VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+	}
+
+	VkShaderModule createShaderModule(const std::vector<char>& code) {
+		VkShaderModuleCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		createInfo.codeSize = code.size();
+		createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+		VkShaderModule shaderModule;
+		if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create shader module");
+		}
+
+		return shaderModule;
 	}
 };
 
-// TODO (jarek): Remove once vulkan buffer is created for glfw context
+// TODO(jarek): Remove once vulkan buffer is created for glfw context
 static void error_callback(int error, const char* description){
 	std::cout << description << "\n";
 }
-
 
 
 float positions[6] = {
@@ -481,30 +515,6 @@ float positions[6] = {
 	 0.0f,  0.5f,
 	 0.5f, -0.5f
 };
-
-
-std::string vertexShader =
-"#version 450 core\n"
-"\n"
-"vec2 positions[3] = vec2[](\n"
-	"vec2(0.0, -0.5),\n"
-	"vec2(0.5, 0.5),\n"
-	"vec2(-0.0, 0.5),\n"
-");\n"
-"\n"
-"void main() {\n"
-"   gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);\n"
-"}\n";
-
-std::string fragmentShader =
-"#version 450 core\n"
-"#extension GL_ARB_seperate_shader_objects : enable\n"
-"\n"
-"layout(location = 0) out vec4 color;\n"
-"\n"
-"void main() {\n"
-"   color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-"}\n";
 
 	
 int main()
